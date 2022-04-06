@@ -127,3 +127,7 @@ pretrained/*
 
 # vscode related
 .vscode/
+
+# additional
+/venv
+*.zip

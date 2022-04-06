@@ -10,12 +10,13 @@ What things you need to install the software and how to install them
 ```
 python 3.8.10 
 tensorflow 2.5.0
-conda
+conda (opt)
 ```
 
 #### Optional
 
-```
+```bash
+sudo apt update
 sudo apt install -y tree unzip wget
 ```
 
@@ -23,13 +24,13 @@ sudo apt install -y tree unzip wget
 
 To install this app in your device, please do the following instructions. In case setting up for serving the model in limited memory, use python `venv` and install requirements using `--no-cache-dir` flag to avoid install process being killed because of low memory.
 
-1. ~~Install packages from the *requirements.txt* file~~
+You can Install packages from the *requirements.txt* file
 
 ```
 pip install -r requirements.txt
 ```
 
-1. As the above method may not work to resolve the requirement dependency, use conda instead, and create new environment from `environment.yml`
+Alternatively, you can use conda instead, and create new environment from `environment.yml`
 
 ```
 conda env create -f environment.yml
@@ -45,19 +46,21 @@ chmod +x update-anago.sh
 
 2. Prepare stanza for Indonesian language support and Tools for evaluation
 
-```
-python -c "import stanfordnlp; import stanza; import nltk; stanfordnlp.download('id'); stanza.download('id'); nltk.download('punkt')"
+```bash
+python prepare.py
 ```
 
-```
+Also prepare tools for evaluating AMR
+
+```bash
 git clone https://github.com/ChunchuanLv/amr-evaluation-tool-enhanced tools/amr-eval
 ```
 
 3. Download [pretrained features model](https://storage.googleapis.com/riset_amr/adylan/pretrained_feature_models.zip) that contains POS Tagger, NER Tagger, and Word2Vec models and put it in the `pretrained` folder. The tree structure should be like this:
 
 ``` bash
-wget https://storage.googleapis.com/riset_amr/adylan/pretrained_feature_models.zip -O pretrained.zip
-unzip pretrained.zip
+wget https://storage.googleapis.com/riset_amr/adylan/pretrained_feature_models.zip -O pretrained.zip && \
+unzip pretrained.zip && \
 rm pretrained.zip
 ```
 
@@ -122,7 +125,24 @@ python amr_parser.py --predict --sentence "Aku makan buah di pagi ini" --output 
 
 The output of the AMR should be included in the `amr.txt` file.
 
-### 
+### Serving the Model for Prediction
+
+For serving this model, we could use gunicorn. By first installing the package then run the server
+
+```bash
+pip install gunicorn
+# gunicorn -w [NUM_WORKER] -b [ADDR:PORT] [PACKAGE]:app 
+gunicorn -w 4 -b 0.0.0.0:5000 rest:app
+#  or use -D to run it as daemon (kill with pkill gunicorn)
+```
+
+now we can test if it works or not from the browser or by using curl/wget
+```bash
+# wget http://[ADDR]:[PORT]/predict?sentence=[URL_ENCODED_TEXT] -O /dev/stdout -q
+wget http://127.0.0.1:5000/predict?sentence=Ini%20adalah%20kalimat%20AMR -O /dev/stdout -q
+```
+
+If it works, next we can configure nginx and systemd around this in case of deployment to production.
 
 ### Training 
 
