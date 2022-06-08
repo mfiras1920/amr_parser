@@ -1,0 +1,15 @@
+digraph {
+	vv1 [label=makan]
+	vv2 [label=pak]
+	vv3 [label=dodi]
+	vv4 [label=buah]
+	vv5 [label=pagi]
+	vv6 [label=hari]
+	vv7 [label=bandung]
+	vv1 -> vv2 [label=ARG0]
+	vv2 -> vv3 [label=name]
+	vv1 -> vv4 [label=ARG1]
+	vv1 -> vv5 [label=time]
+	vv5 -> vv6 [label=mod]
+	vv5 -> vv7 [label=mod]
+}
